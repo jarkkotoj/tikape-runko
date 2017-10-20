@@ -2,17 +2,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
     <head>
-        <title>Otsikko</title>
+        <title>Reseptit</title>
         <meta charset="utf-8" />
     </head>
 
     <body>
-        <h1>Hei opiskelijat!</h1>
+        <h1>Reseptiarkisto</h1>
 
+        
         <ol>
-            <li th:each="opiskelija: ${opiskelijat}">
-                <span th:text="${opiskelija.nimi}">opiskelijan nimi</span> <a th:href="${'/opiskelijat/' + opiskelija.id}">linkki</a>
+            <li th:each="Resepti: ${reseptit}">
+                <a th:href="@{~/reseptit/{id}(id=${Resepti.id})}">
+                    <span th:text="${Resepti.nimi}">Resepti</span>
+                </a>
+                <!--<span th:text="${Resepti.nimi}">reseptin nimi</span> <a th:href="${'/reseptit/' + Resepti.id}">linkki</a>
+                -->
             </li>
-        </ol>
+        </ol> 
     </body>
 </html>

@@ -7,10 +7,16 @@
     </head>
 
     <body>
-        <h1>Heippa vaan!</h1>
+        <h1 th:text="${resepti.nimi}">Reseptin nimi</h1>
+        
+        <h2>Ainesosat</h2>
+        
+        <ul>
+            <li th:each="RaakaAine : ${raakaAineet}">
+                <span th:text="${RaakaAine.nimi}">RaakaAine</span>
+            </li>
+        </ul>
+        
 
-        <p>Ja .. <span th:text="${viesti}">jotain?</span></p>
-
-        <p><a href="/opiskelijat">Tästä opiskelijalistaukseen.</a></p>
     </body>
 </html>
