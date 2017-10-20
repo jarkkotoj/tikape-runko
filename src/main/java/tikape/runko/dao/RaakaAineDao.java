@@ -3,14 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tikape.runko.database;
+package tikape.runko.dao;
 
+import tikape.runko.dao.Dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import tikape.runko.database.Database;
 import tikape.runko.domain.*;
 
 public class RaakaAineDao implements Dao<RaakaAine, Integer> {
@@ -23,6 +25,8 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
 
     @Override
     public RaakaAine findOne(Integer key) throws SQLException {
+        return findAll().stream().filter(u -> u.getId().equals(key)).findFirst().get();
+        /*
         Connection connection = database.getConnection();
         PreparedStatement stmt = connection.prepareStatement("SELECT * FROM RaakaAine WHERE id = ?");
         stmt.setObject(1, key);
@@ -43,28 +47,22 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
         connection.close();
 
         return o;
+        */
     }
 
-    @Override
+    @Override  
     public List<RaakaAine> findAll() throws SQLException {
+        List<RaakaAine> aineet = new ArrayList<>();
 
-        Connection connection = database.getConnection();
-        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM RaakaAine");
+        try (Connection conn = database.getConnection();
+            ResultSet result = conn.prepareStatement("SELECT id, nimi FROM RaakaAine").executeQuery()) {
 
-        ResultSet rs = stmt.executeQuery();
-        List<RaakaAine> raakaAineet = new ArrayList<>();
-        while (rs.next()) {
-            Integer id = rs.getInt("id");
-            String nimi = rs.getString("nimi");
-
-            raakaAineet.add(new RaakaAine(id, nimi));
+            while (result.next()) {
+                aineet.add(new RaakaAine(result.getInt("id"), result.getString("nimi")));
+            }
         }
 
-        rs.close();
-        stmt.close();
-        connection.close();
-
-        return raakaAineet;
+        return aineet;
     }
 
     public List<Resepti> findResepti(Integer raakaAine_key) throws SQLException {
@@ -79,7 +77,63 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
             reseptit.add(new Resepti(rs.getInt("id"), rs.getString("nimi")));
         }
         return reseptit;
-    }    
+    }
+    
+    public List<RaakaAine> findRaakaAineet(Integer resepti_key) throws SQLException {
+        String query = "SELECT RaakaAine.id, RaakaAine.nimi FROM RaakaAine, ReseptiRaakaAine\n"
+                + "              WHERE RaakaAine.id = ReseptiRaakaAine.raaka_aine_id "
+                + "                  AND ReseptiRaakaAine.resepti_id = ?;";
+
+        List<RaakaAine> aineet = new ArrayList<>();
+
+        try (Connection conn = database.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, resepti_key);
+            ResultSet result = stmt.executeQuery();
+
+            while (result.next()) {
+                aineet.add(new RaakaAine(result.getInt("id"), result.getString("nimi")));
+            }
+        }
+
+        return aineet;
+    }
+    
+    private RaakaAine findByNameRaakaAine(String name) throws SQLException {
+        try (Connection conn = database.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement("SELECT id, nimi FROM RaakaAine WHERE nimi = ?");
+            stmt.setString(1, name);
+
+            ResultSet result = stmt.executeQuery();
+            if (!result.next()) {
+                return null;
+            }
+            
+
+            return new RaakaAine(result.getInt("id"), result.getString("nimi"));
+        }
+    }
+
+    @Override
+    public RaakaAine saveOrUpdate(RaakaAine object) throws SQLException {
+        // simply support saving -- disallow saving if task with 
+        // same name exists
+        RaakaAine byName = findByNameRaakaAine(object.getNimi());
+
+        if (byName != null) {
+            return byName;
+        }
+
+        try (Connection conn = database.getConnection()) {
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO RaakaAine (nimi) VALUES (?)");
+            stmt.setString(1, object.getNimi());
+            stmt.executeUpdate();
+            
+        }
+
+        return findByNameRaakaAine(object.getNimi());
+
+    }
     
     @Override
     public void delete(Integer key) throws SQLException {
