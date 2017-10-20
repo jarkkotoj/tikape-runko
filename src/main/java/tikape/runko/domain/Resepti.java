@@ -1,11 +1,11 @@
 package tikape.runko.domain;
 
-public class Opiskelija {
+public class Resepti {
 
     private Integer id;
     private String nimi;
 
-    public Opiskelija(Integer id, String nimi) {
+    public Resepti(Integer id, String nimi) {
         this.id = id;
         this.nimi = nimi;
     }
