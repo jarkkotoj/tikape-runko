@@ -76,6 +76,30 @@ public class ReseptiRaakaAineDao implements Dao<ReseptiRaakaAine, Integer> {
         return lista;
     }
 
+    public List<ReseptiRaakaAine> findForResepti(Integer resepti_id) throws SQLException {
+
+        Connection connection = database.getConnection();
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM ReseptiRaakaAine WHERE ReseptiRaakaAine.resepti_id = ? ORDER BY ReseptiRaakaAine.jarjestys ASC");
+        stmt.setInt(1,resepti_id);
+        ResultSet rs = stmt.executeQuery();
+        List<ReseptiRaakaAine> lista = new ArrayList<>();
+        while (rs.next()) {
+            Integer id = rs.getInt("id");
+            Integer raakaAineId = rs.getInt("raaka_aine_id");
+            Integer reseptiId = rs.getInt("resepti_id");
+            Integer jarjestys = rs.getInt("jarjestys");            
+            String maara = rs.getString("maara");
+            String ohje = rs.getString("ohje");            
+
+            lista.add(new ReseptiRaakaAine(id, raakaAineId, reseptiId, jarjestys, maara, ohje));
+        }
+
+        rs.close();
+        stmt.close();
+        connection.close();
+        return lista;
+    }
+    
     public ReseptiRaakaAine saveOrUpdate(ReseptiRaakaAine raa) throws SQLException {
         int id=-1;
         Connection conn = database.getConnection();

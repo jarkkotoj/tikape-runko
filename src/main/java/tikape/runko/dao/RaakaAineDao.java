@@ -82,7 +82,7 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
     public List<RaakaAine> findRaakaAineet(Integer resepti_key) throws SQLException {
         String query = "SELECT RaakaAine.id, RaakaAine.nimi FROM RaakaAine, ReseptiRaakaAine\n"
                 + "              WHERE RaakaAine.id = ReseptiRaakaAine.raaka_aine_id "
-                + "                  AND ReseptiRaakaAine.resepti_id = ?;";
+                + "                  AND ReseptiRaakaAine.resepti_id = ? GROUP BY RaakaAine.id ORDER BY ReseptiRaakaAine.jarjestys ASC";
 
         List<RaakaAine> aineet = new ArrayList<>();
 
@@ -128,7 +128,8 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
             PreparedStatement stmt = conn.prepareStatement("INSERT INTO RaakaAine (nimi) VALUES (?)");
             stmt.setString(1, object.getNimi());
             stmt.executeUpdate();
-            
+            stmt.close();
+            conn.close();
         }
 
         return findByNameRaakaAine(object.getNimi());

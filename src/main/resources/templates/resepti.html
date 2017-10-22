@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
     <head>
-        <title>Otsikko</title>
+        <title th:text="${resepti.nimi}">Otsikko</title>
         <meta charset="utf-8" />
     </head>
 
@@ -11,11 +11,14 @@
         
         <h2>Ainesosat</h2>
         
-        <ul>
-            <li th:each="RaakaAine : ${raakaAineet}">
-                <span th:text="${RaakaAine.nimi}">RaakaAine</span>
+        <ol>
+            <li th:each="reseptiraakaaine : ${reseptiRaakaAineet}">
+                <span th:each="raakaaine : ${raakaAineet}" th:if="${raakaaine.id == reseptiraakaaine.RaakaAineId}" th:text="${raakaaine.nimi}"></span><span th:text="${' ' +reseptiraakaaine.maara}">Määrä</span><span th:text="${': '+ reseptiraakaaine.ohje}"></span>
             </li>
-        </ul>
+            <!--<li th:each="RaakaAine : ${raakaAineet}">
+                <span th:each="reseptiraakaaine : ${reseptiRaakaAineet}" th:if="${reseptiraakaaine.RaakaAineId == RaakaAine.id} " th:text="${reseptiraakaaine.maara}">Määrä</span> <span th:text="${RaakaAine.nimi}">RaakaAine</span>
+            </li>-->
+        </ol>
         
 
     </body>

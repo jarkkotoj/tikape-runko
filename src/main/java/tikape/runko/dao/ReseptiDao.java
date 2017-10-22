@@ -111,6 +111,8 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
             PreparedStatement stmt = conn.prepareStatement("INSERT INTO Resepti (nimi) VALUES (?)");
             stmt.setString(1, object.getNimi());
             stmt.executeUpdate();
+            stmt.close();
+            conn.close();
         }
 
         return findByNameResepti(object.getNimi());

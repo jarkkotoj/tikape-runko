@@ -8,16 +8,21 @@
 
     <body>
         <h1>Reseptiarkisto</h1>
-
         
+        <h2>Lisää uusi resepti</h2>
+        <form method="POST" action="/reseptit">
+            <input type="text" name="nimi" /><br/>
+            <input type="submit" value="Lisää"/>
+        </form>
+        
+        <h2>Valmiit reseptit</h2>
         <ol>
             <li th:each="Resepti: ${reseptit}">
                 <a th:href="@{~/reseptit/{id}(id=${Resepti.id})}">
                     <span th:text="${Resepti.nimi}">Resepti</span>
                 </a>
-                <!--<span th:text="${Resepti.nimi}">reseptin nimi</span> <a th:href="${'/reseptit/' + Resepti.id}">linkki</a>
-                -->
             </li>
         </ol> 
+        
     </body>
 </html>
