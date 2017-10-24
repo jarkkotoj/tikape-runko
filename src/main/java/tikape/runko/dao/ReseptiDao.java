@@ -5,7 +5,6 @@
  */
 package tikape.runko.dao;
 
-import tikape.runko.dao.Dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,7 +18,7 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
 
     private Database database;
 
-    public ReseptiDao(Database database) {
+    public ReseptiDao(Database database) throws ClassNotFoundException {
         this.database = database;
     }
 
