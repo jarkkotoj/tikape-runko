@@ -55,12 +55,16 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
         List<RaakaAine> aineet = new ArrayList<>();
 
         try (Connection conn = database.getConnection();
-            ResultSet result = conn.prepareStatement("SELECT id, nimi FROM RaakaAine").executeQuery()) {
+            ResultSet result = conn.prepareStatement("SELECT id, nimi FROM RaakaAine ORDER BY nimi").executeQuery()) {
 
             while (result.next()) {
                 aineet.add(new RaakaAine(result.getInt("id"), result.getString("nimi")));
             }
+            
+            result.close();
+            conn.close();
         }
+        
 
         return aineet;
     }
@@ -68,13 +72,14 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
     public List<Resepti> findResepti(Integer raakaAine_key) throws SQLException {
         Connection conn = database.getConnection();
         List<Resepti> reseptit = new ArrayList<>();
-        PreparedStatement stmt = conn.prepareStatement("SELECT Resepti.id, Resepti.nimi FROM Resepti, ReseptiRaakaAine \n" 
-                + "WHERE ReseptiRaakaAine.resepti_id = Resepti.id AND ReseptiRaakaAine.raaka_aine_id = ? ");
+        PreparedStatement stmt = conn.prepareStatement("SELECT Resepti.id, Resepti.nimi, Resepti.selitys FROM Resepti, ReseptiRaakaAine \n" 
+                + "WHERE ReseptiRaakaAine.resepti_id = Resepti.id AND ReseptiRaakaAine.raaka_aine_id = ? "
+                + "GROUP BY Resepti.nimi ORDER BY Resepti.nimi");
         stmt.setInt(1, raakaAine_key);
         ResultSet rs = stmt.executeQuery();
         
         while (rs.next()) {
-            reseptit.add(new Resepti(rs.getInt("id"), rs.getString("nimi")));
+            reseptit.add(new Resepti(rs.getInt("id"), rs.getString("nimi"), rs.getString("selitys")));
         }
         return reseptit;
     }

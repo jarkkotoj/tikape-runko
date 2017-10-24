@@ -7,19 +7,28 @@
     </head>
 
     <body>
-        <h1>Lisätyt raaka-aineet</h1>
+        <h1>Raaka-aineet</h1>
         
-        <ul>
-            <li th:each="RaakaAine : ${raakaAineet}">
-                <span th:text="${RaakaAine.nimi}">RaakaAine</span>
-            </li>
-        </ul>
-    
+        <a href="/">Etusivulle</a><br/>
+        <a href="/reseptit">Reseptiarkistoon</a>
+        
         <h2>Lisää uusi raaka-aine</h2>
 
         <form method="POST" action="/raakaAineet">
             <input type="text" name="nimi"/><br/>
             <input type="submit" value="Lisää!"/>
         </form> 
+        
+        <h2>Lisätyt raaka-aineet</h2>
+        
+        <ul>
+            <li th:each="RaakaAine : ${raakaAineet}">
+                <a th:href="@{~/raakaAineet/{id}(id=${RaakaAine.id})}">
+                    <span th:text="${RaakaAine.nimi}">RaakaAine</span>
+                </a>
+            </li>
+        </ul>
+    
+        
     </body>
 </html>

@@ -59,6 +59,15 @@ public class Main {
             return "";
         });
         
+        Spark.get("/raakaAineet/:id", (req, res) -> {
+            HashMap map = new HashMap<>();
+            Integer aineId = Integer.parseInt(req.params(":id"));
+            map.put("raakaAine", raakaAineet.findOne(aineId));
+            map.put("resepti", raakaAineet.findResepti(aineId));
+            
+            return new ModelAndView(map, "raakaAineReseptit");
+        }, new ThymeleafTemplateEngine());
+        
         Spark.get("/reseptit", (req, res) -> {
             HashMap map = new HashMap<>();
             map.put("reseptit", reseptit.findAll());
@@ -67,7 +76,7 @@ public class Main {
         }, new ThymeleafTemplateEngine());
         
         Spark.post("/reseptit", (req, res) -> {
-            Resepti resepti = new Resepti(-1,req.queryParams("nimi"));
+            Resepti resepti = new Resepti(-1,req.queryParams("nimi"), "");
             String id = randomStringGenerator(20);
             resepteja.put(id, resepti);
             raat.put(resepti, new ArrayList<ReseptiRaakaAine>());
@@ -146,6 +155,9 @@ public class Main {
         Spark.post("/reseptit4/:id", (req,res)-> {
            String id = req.params(":id");
            Resepti resepti = resepteja.get(id);
+           
+           String selitys = req.queryParams("selitys");
+           resepti.setSelitys(selitys);
            
            Resepti sqlresepti = reseptit.saveOrUpdate(resepti);
            for (ReseptiRaakaAine resraa : raat.get(resepti) ) {

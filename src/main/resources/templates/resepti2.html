@@ -27,16 +27,20 @@
                             raaka-aine nimi
                         </option>
                     </select>
-                    <input type="text" name="maara"/>
-                    <input type="text" name="ohje"/>
+                    Määrä: <input type="text" name="maara"/>
+                    Selitys: <input type="text" name="ohje"/>
                     <input type="submit" value="Lisää"/>
                 </form>
             </li>
         </ol>
         <h2 th:if="${#lists.size(reseptiRaakaAineet)>0}">Tuliko valmista?</h2>
         <p th:if="${#lists.size(reseptiRaakaAineet)>0}"> Kun olet valmis, paina allaolevaa painiketta </p>
+        <p th:if="${#lists.size(reseptiRaakaAineet)>0}"> Kirjota reseptille ohjeet: </p>
         <form method="POST" th:action="@{~/reseptit4/{id}(id=${avain})}" th:if="${#lists.size(reseptiRaakaAineet)>0}">
+            <!-- <input style="height:150px; width: 400px;" type="text" name="selitys"/> -->
+            <textarea name="selitys" cols="80" rows="5"></textarea><br/>
             <input type="submit" value="Valmis resepti!"/>
+            
         </form>
 
     </body>

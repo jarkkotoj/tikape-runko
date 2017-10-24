@@ -9,17 +9,20 @@
     <body>
         <h1 th:text="${resepti.nimi}">Reseptin nimi</h1>
         
+        <a href="/">Etusivulle</a><br/>
+        <a href="/reseptit">Reseptiarkistoon</a><br/>
+        <a href="/raakaAineet">Raaka-aineisiin</a>
+        
         <h2>Ainesosat</h2>
         
         <ol>
             <li th:each="reseptiraakaaine : ${reseptiRaakaAineet}">
                 <span th:each="raakaaine : ${raakaAineet}" th:if="${raakaaine.id == reseptiraakaaine.RaakaAineId}" th:text="${raakaaine.nimi}"></span><span th:text="${' ' +reseptiraakaaine.maara}">Määrä</span><span th:text="${': '+ reseptiraakaaine.ohje}"></span>
             </li>
-            <!--<li th:each="RaakaAine : ${raakaAineet}">
-                <span th:each="reseptiraakaaine : ${reseptiRaakaAineet}" th:if="${reseptiraakaaine.RaakaAineId == RaakaAine.id} " th:text="${reseptiraakaaine.maara}">Määrä</span> <span th:text="${RaakaAine.nimi}">RaakaAine</span>
-            </li>-->
         </ol>
         
+        <h2>Ohjeet: </h2>
+            <span th:text="${resepti.selitys}"> Reseptin selitys</span>
 
     </body>
 </html>

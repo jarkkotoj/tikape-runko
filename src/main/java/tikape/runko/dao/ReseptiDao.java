@@ -36,8 +36,9 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
 
         Integer id = rs.getInt("id");
         String nimi = rs.getString("nimi");
+        String selitys = rs.getString("selitys");
 
-        Resepti o = new Resepti(id, nimi);
+        Resepti o = new Resepti(id, nimi, selitys);
 
         rs.close();
         stmt.close();
@@ -50,15 +51,16 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
     public List<Resepti> findAll() throws SQLException {
 
         Connection connection = database.getConnection();
-        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Resepti");
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Resepti ORDER BY nimi");
 
         ResultSet rs = stmt.executeQuery();
         List<Resepti> reseptit = new ArrayList<>();
         while (rs.next()) {
             Integer id = rs.getInt("id");
             String nimi = rs.getString("nimi");
+            String selitys = rs.getString("selitys");
 
-            reseptit.add(new Resepti(id, nimi));
+            reseptit.add(new Resepti(id, nimi, selitys));
         }
 
         rs.close();
@@ -84,7 +86,7 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
     
     private Resepti findByNameResepti(String name) throws SQLException {
         try (Connection conn = database.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement("SELECT id, nimi FROM Resepti WHERE nimi = ?");
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Resepti WHERE nimi = ?");
             stmt.setString(1, name);
 
             ResultSet result = stmt.executeQuery();
@@ -92,7 +94,7 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
                 return null;
             }
 
-            return new Resepti(result.getInt("id"), result.getString("nimi"));
+            return new Resepti(result.getInt("id"), result.getString("nimi"), result.getString("selitys"));
         }
     }
     
@@ -107,8 +109,9 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
         }
 
         try (Connection conn = database.getConnection()) {
-            PreparedStatement stmt = conn.prepareStatement("INSERT INTO Resepti (nimi) VALUES (?)");
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO Resepti (nimi, selitys) VALUES (?, ?)");
             stmt.setString(1, object.getNimi());
+            stmt.setString(2, object.getSelitys());
             stmt.executeUpdate();
             stmt.close();
             conn.close();
