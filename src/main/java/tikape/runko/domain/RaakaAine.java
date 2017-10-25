@@ -1,5 +1,7 @@
 package tikape.runko.domain;
 
+/*Olio RaakaAine-taulun käsittelyyn
+*/
 public class RaakaAine {
 
     private Integer id;

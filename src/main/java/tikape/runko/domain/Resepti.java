@@ -1,5 +1,9 @@
 package tikape.runko.domain;
 
+/*
+ * Luokka ja oliot Resepti-taulun muokkaamiseen SQL-tietokannassa.
+ */
+
 public class Resepti {
 
     private Integer id;

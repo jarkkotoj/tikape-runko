@@ -1,5 +1,8 @@
 package tikape.runko.domain;
 
+/*Tietokannassa olevan ReseptiRaakaAine-liitostaulun käsittelyyn tarvittava
+ luokka.*/
+
 public class ReseptiRaakaAine {
 
     private Integer id;

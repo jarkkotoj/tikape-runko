@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * RaakaAine-taulun muokkamiseen ja SQL-komentojen tekemiseen tarkoitettu
+ * luokka.
  */
 package tikape.runko.dao;
 
@@ -22,11 +21,11 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
     public RaakaAineDao(Database database) {
         this.database = database;
     }
-
+    
+    //Etsii tietokannasta avaimen perusteella RaakaAine-olion
     @Override
     public RaakaAine findOne(Integer key) throws SQLException {
-        return findAll().stream().filter(u -> u.getId().equals(key)).findFirst().get();
-        /*
+        
         Connection connection = database.getConnection();
         PreparedStatement stmt = connection.prepareStatement("SELECT * FROM RaakaAine WHERE id = ?");
         stmt.setObject(1, key);
@@ -47,9 +46,10 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
         connection.close();
 
         return o;
-        */
+        
     }
-
+    
+    //Etsii kaikki oliot tietokannasta ja palauttaa ne aakkosjärjestyksessä.
     @Override  
     public List<RaakaAine> findAll() throws SQLException {
         List<RaakaAine> aineet = new ArrayList<>();
@@ -65,10 +65,10 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
             conn.close();
         }
         
-
         return aineet;
     }
-
+    
+    //Etsii Reseptit, joissa esiintyy tietty raaka-aine
     public List<Resepti> findResepti(Integer raakaAine_key) throws SQLException {
         Connection conn = database.getConnection();
         List<Resepti> reseptit = new ArrayList<>();
@@ -84,6 +84,7 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
         return reseptit;
     }
     
+    //Etsii reseptiin liittyvät raaka-aineet ja järjestää ne järjestysluvun mukaan
     public List<RaakaAine> findRaakaAineet(Integer resepti_key) throws SQLException {
         String query = "SELECT RaakaAine.id, RaakaAine.nimi FROM RaakaAine, ReseptiRaakaAine\n"
                 + "              WHERE RaakaAine.id = ReseptiRaakaAine.raaka_aine_id "
@@ -104,6 +105,7 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
         return aineet;
     }
     
+    //Etsii raaka-aineen nimen perusteella
     private RaakaAine findByNameRaakaAine(String name) throws SQLException {
         try (Connection conn = database.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("SELECT id, nimi FROM RaakaAine WHERE nimi = ?");
@@ -118,7 +120,9 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
             return new RaakaAine(result.getInt("id"), result.getString("nimi"));
         }
     }
-
+    /*Tallentaa tai päivittää raaka-aineen tietokantaan ja palauttaa
+     raaka-aine olion oikealla id:llä
+    */
     @Override
     public RaakaAine saveOrUpdate(RaakaAine object) throws SQLException {
         // simply support saving -- disallow saving if task with 
@@ -141,6 +145,7 @@ public class RaakaAineDao implements Dao<RaakaAine, Integer> {
 
     }
     
+    //Poistaa raaka-aineen tietokannasta
     @Override
     public void delete(Integer key) throws SQLException {
         Connection conn = database.getConnection();

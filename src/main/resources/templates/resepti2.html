@@ -10,7 +10,9 @@
         <h1 th:text="${resepti.nimi}">Reseptin nimi</h1>
         
         <h2>Valmiit ainesosat</h2>
-        
+        <!-- Listaa reseptin raaka-aineet lisäysjärjestyksessä
+        ja sen lisäksi antaa niihin kuuluvat määrät ja ohjeet. 
+        Viimeisimmän lisäyksen reseptiin voi poistaa.-->
         <ol>
             <li th:each="reseptiraakaaine, iterStat : ${reseptiRaakaAineet}">
                 <form method="POST" th:action="@{~/reseptit3/{id}(id=${avain})}" >
@@ -33,6 +35,8 @@
                 </form>
             </li>
         </ol>
+        <!-- Kun raaka-aineita on vähitään yksi, reseptin voi julistaa valmiiksi
+        ja lisätä tietokantaan. Halutessa reseptiin voi vielä lisätä ylimääräisen ohjeen.-->
         <h2 th:if="${#lists.size(reseptiRaakaAineet)>0}">Tuliko valmista?</h2>
         <p th:if="${#lists.size(reseptiRaakaAineet)>0}"> Kun olet valmis, paina allaolevaa painiketta </p>
         <p th:if="${#lists.size(reseptiRaakaAineet)>0}"> Kirjota reseptille ohjeet: </p>

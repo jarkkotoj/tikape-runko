@@ -11,7 +11,6 @@ import java.util.Random;
 import java.util.Comparator;
 import spark.ModelAndView;
 import spark.Spark;
-import static spark.Spark.*;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
 import tikape.runko.database.*;
 import tikape.runko.dao.RaakaAineDao;
@@ -22,19 +21,24 @@ import tikape.runko.domain.ReseptiRaakaAine;
 import tikape.runko.domain.Resepti;
 
 public class Main {
-    
+    //Satunnaisavaingeneraattorin tarvitsemia olioita.
     public static final String alphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static Random rand = new Random();
     
     public static void main(String[] args) throws Exception {
+        //SQL-yhteydet tietokantaan
         Database database = new Database("jdbc:sqlite:smoothiet.db");
         ReseptiDao reseptit = new ReseptiDao(database);
         RaakaAineDao raakaAineet = new RaakaAineDao(database);
         ReseptiRaakaAineDao reseptiRaakaAineet = new ReseptiRaakaAineDao(database);
         
+        //Välimuisti uusien reseptien muokkaamiseen
         HashMap<String,Resepti> resepteja = new HashMap<String,Resepti>();
         HashMap<Resepti, List<ReseptiRaakaAine> > raat = new HashMap<Resepti, List<ReseptiRaakaAine>>();
         
+        /*Seuraa pitkä lista Spark-komentoja.*/
+        
+        //Etusivu
         Spark.get("/", (req, res) -> {
             HashMap map = new HashMap<>();
 
@@ -42,7 +46,7 @@ public class Main {
         }, new ThymeleafTemplateEngine());
 
 
-
+        //Listaa raaka-aineet
         Spark.get("/raakaAineet", (req, res) -> {
             HashMap map = new HashMap<>();
             map.put("raakaAineet", raakaAineet.findAll());
@@ -51,6 +55,7 @@ public class Main {
             return new ModelAndView(map, "raakaAineet");
         }, new ThymeleafTemplateEngine());
         
+        //Lisää raaka-aineita
         Spark.post("/raakaAineet", (req, res) -> {
             RaakaAine aine = new RaakaAine(-1, req.queryParams("nimi"));
             raakaAineet.saveOrUpdate(aine);
@@ -59,6 +64,7 @@ public class Main {
             return "";
         });
         
+        //Näyttää kunkin raaka-aineen esiintymiset resepteissä
         Spark.get("/raakaAineet/:id", (req, res) -> {
             HashMap map = new HashMap<>();
             Integer aineId = Integer.parseInt(req.params(":id"));
@@ -68,6 +74,7 @@ public class Main {
             return new ModelAndView(map, "raakaAineReseptit");
         }, new ThymeleafTemplateEngine());
         
+        //Listaa reseptit
         Spark.get("/reseptit", (req, res) -> {
             HashMap map = new HashMap<>();
             map.put("reseptit", reseptit.findAll());
@@ -75,15 +82,8 @@ public class Main {
             return new ModelAndView(map, "reseptit");
         }, new ThymeleafTemplateEngine());
         
-        Spark.post("/reseptit", (req, res) -> {
-            Resepti resepti = new Resepti(-1,req.queryParams("nimi"), "");
-            String id = randomStringGenerator(20);
-            resepteja.put(id, resepti);
-            raat.put(resepti, new ArrayList<ReseptiRaakaAine>());
-            res.redirect("/reseptit2/" + id);
-            return "";
-        });
-        
+        /*Hakee yksittäisen reseptin tiedot ja listaa sisällön. Valmiita reseptejä
+        ei voi muokata. */
         Spark.get("/reseptit/:id", (req, res) -> {
             HashMap map = new HashMap<>();
             Integer reseptiId = Integer.parseInt(req.params(":id"));
@@ -94,6 +94,19 @@ public class Main {
             return new ModelAndView(map, "resepti");
         }, new ThymeleafTemplateEngine());
         
+        /*Lisää reseptin välimuistiin ja ohjaa reseptin luomissivulle, jolle annetaan 
+        satunnainen String-tunnus. Samalla luodaan ReseptiRaakaAine-List.        
+        */
+        Spark.post("/reseptit", (req, res) -> {
+            Resepti resepti = new Resepti(-1,req.queryParams("nimi"), "");
+            String id = randomStringGenerator(20);
+            resepteja.put(id, resepti);
+            raat.put(resepti, new ArrayList<ReseptiRaakaAine>());
+            res.redirect("/reseptit2/" + id);
+            return "";
+        });
+        
+        //Näyttää reseptin luomissivun, johon listataan nykyinen sisältö
         Spark.get("/reseptit2/:id", (req, res) -> {
             HashMap map = new HashMap<>();
             String id = req.params(":id");
@@ -117,6 +130,7 @@ public class Main {
             return new ModelAndView(map, "resepti2");
         }, new ThymeleafTemplateEngine());
         
+        //Lisää raaka-aineen muokattavaan reseptiin ja palauttaa tuoreen muokkaussivun
         Spark.post("/reseptit2/:id", (req,res)-> {
            String id = req.params(":id");
            Resepti resepti = resepteja.get(id);
@@ -130,6 +144,7 @@ public class Main {
            return "";
         });
         
+        //Poistaa viimeisimmän raaka-aineen reseptistä ja palauttaa muokkaussivun
         Spark.post("/reseptit3/:id", (req,res)-> {
            String id = req.params(":id");
            Resepti resepti = resepteja.get(id);
@@ -138,6 +153,11 @@ public class Main {
            
            List<ReseptiRaakaAine> raa = raat.get(resepti);
            ListIterator<ReseptiRaakaAine> litr=raa.listIterator();
+           /*ArrayList tulee käydä indeksittäin läpi; se ei osaa tunnistaa
+           kahta ReseptiRaakaAine-oliota samoiksi ilman erikikkailua.
+           Nykyinen toteutus toimii siten, että järjestysnumeroita on aina 
+           yhdestä n:ään tasavälein ja ne eivät voi mennä päällekäin.*/
+           
            int ind=-1;
            while (litr.hasNext()) {
                ind = litr.nextIndex();
@@ -152,6 +172,9 @@ public class Main {
            return "";
         });
         
+        /*Kun resepti on valmis, se lisätään tietokantaan eikä sitä voi enää muokata.
+        Samalla resepti ja raaka-ainelistaukset poistetaan ohjelman välimuistista.
+        Palauttaa reseptilistauksen, johon uusi resepti on nyt lisätty.*/
         Spark.post("/reseptit4/:id", (req,res)-> {
            String id = req.params(":id");
            Resepti resepti = resepteja.get(id);
@@ -171,6 +194,7 @@ public class Main {
         });
     }
     
+    //Luo satunnaisen tunnusavaimen
     public static String randomStringGenerator(int length) {
         String randkey = "";
         int ll = alphabet.length();
@@ -179,6 +203,8 @@ public class Main {
         }
         return randkey;
     }
+    
+    //Järjestää List<ReseptiRaakaAine>:n järjestysluvun mukaiseen järjestykseen
     public static void sortListOfReseptiRaakaAine(List<ReseptiRaakaAine> lista) {
         Collections.sort(lista, new Comparator<ReseptiRaakaAine>(){
             public int compare(ReseptiRaakaAine r1, ReseptiRaakaAine r2) {

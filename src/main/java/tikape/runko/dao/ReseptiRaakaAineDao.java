@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+  ReseptiRaakaAine-taulun SQL-yhteyden luomiseen ja taulun muokkaamiseen
+  tarkoitettu luokka.
  */
 package tikape.runko.dao;
 
@@ -22,7 +21,8 @@ public class ReseptiRaakaAineDao implements Dao<ReseptiRaakaAine, Integer> {
     public ReseptiRaakaAineDao(Database database) {
         this.database = database;
     }
-
+    
+    //Etsii id:n mukaan tietokannasta yhden olion
     @Override
     public ReseptiRaakaAine findOne(Integer key) throws SQLException {
         Connection connection = database.getConnection();
@@ -49,7 +49,8 @@ public class ReseptiRaakaAineDao implements Dao<ReseptiRaakaAine, Integer> {
 
         return o;
     }
-
+    
+    //Palauttaa aivan kaikki oliot tietokannasta
     @Override
     public List<ReseptiRaakaAine> findAll() throws SQLException {
 
@@ -75,7 +76,9 @@ public class ReseptiRaakaAineDao implements Dao<ReseptiRaakaAine, Integer> {
 
         return lista;
     }
-
+    
+    /*Hakee tietokannasta kaikki oliot resepti_id:n mukaan. Järjestää
+    järjestysluvun mukaan */
     public List<ReseptiRaakaAine> findForResepti(Integer resepti_id) throws SQLException {
 
         Connection connection = database.getConnection();
@@ -100,6 +103,8 @@ public class ReseptiRaakaAineDao implements Dao<ReseptiRaakaAine, Integer> {
         return lista;
     }
     
+    /*Lisää tai päivittää olion tietokantaan ja palauttaa olion ilmentymän
+    oikealla id:llä merkittynä*/
     public ReseptiRaakaAine saveOrUpdate(ReseptiRaakaAine raa) throws SQLException {
         int id=-1;
         Connection conn = database.getConnection();
@@ -142,6 +147,7 @@ public class ReseptiRaakaAineDao implements Dao<ReseptiRaakaAine, Integer> {
         return raa1;
     }
     
+    //Poistaa rivin tietokannasta id:n mukaan
     @Override
     public void delete(Integer key) throws SQLException {
         Connection conn = database.getConnection();

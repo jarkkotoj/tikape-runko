@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+  Resepti-taulun SQL-yhteyden luomiseen ja taulun muokkaamiseen
+  tarkoitettu luokka.
  */
 package tikape.runko.dao;
 
@@ -21,7 +20,8 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
     public ReseptiDao(Database database) throws ClassNotFoundException {
         this.database = database;
     }
-
+    
+    //Etsii Resepti-rivin id:n perusteella
     @Override
     public Resepti findOne(Integer key) throws SQLException {
         Connection connection = database.getConnection();
@@ -46,7 +46,8 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
 
         return o;
     }
-
+    
+    //Palauttaa kaikki Resepti-oliot tietokannasta aakkosjärjestyksessä
     @Override
     public List<Resepti> findAll() throws SQLException {
 
@@ -70,6 +71,7 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
         return reseptit;
     }
     
+    //Palauttaa kaikki reseptiin liittyvät raaka-aineet
     public List<RaakaAine> findIngredient(Integer resepti_key) throws SQLException {
         Connection conn = database.getConnection();
         List<RaakaAine> raakaAineet = new ArrayList<>();
@@ -84,6 +86,7 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
         return raakaAineet;
     }
     
+    //Etsii reseptin nimen perusteella. Samoja reseptinimiä ei sallita!
     private Resepti findByNameResepti(String name) throws SQLException {
         try (Connection conn = database.getConnection()) {
             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Resepti WHERE nimi = ?");
@@ -98,6 +101,8 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
         }
     }
     
+    /*Tallentaa tai päivittää reseptin ja palauttaa uuden resepti-olion oikealla
+    id:llä*/
     @Override
     public Resepti saveOrUpdate(Resepti object) throws SQLException {
         // simply support saving -- disallow saving if task with 
@@ -121,6 +126,7 @@ public class ReseptiDao implements Dao<Resepti, Integer> {
 
     }
     
+    /* Poistaa reseptin tietokannasta */
     @Override
     public void delete(Integer key) throws SQLException {
         Connection conn = database.getConnection();
